@@ -1,13 +1,15 @@
 exports.IntCodeMachine = class IntCodeMachine {
-    constructor(memory, debug = false, noun, verb) {
-        this.mem = memory;
+    constructor(program, debug = false, noun, verb) {
+        this.program = program.slice(0);
         this.pc = 0;
         this.inputs = [];
         this.outputs = [];
         this.debug = debug;
         this.running = true;
-        if (noun) { memory[1] = noun; }
-        if (verb) { memory[2] = verb; }
+        this.waitingForIO = false;
+        if (noun) { program[1] = noun; }
+        if (verb) { program[2] = verb; }
+        this.reset();
     }
 
     step() {
@@ -65,7 +67,7 @@ exports.IntCodeMachine = class IntCodeMachine {
         } else {
             this.log(`Halting to wait for input.`);
             //wait for input
-            this.running = false;
+            this.waitingForIO = true;
         }
     }
 
@@ -73,16 +75,16 @@ exports.IntCodeMachine = class IntCodeMachine {
         this.log(`Outputting value ${this.mem[addresses[0]]} to buffer.`);
         this.outputs.push(this.mem[addresses[0]]);
         this.pc += 2;
-        if (this.outputs[this.outputs.length - 1] !== 0) { this.running = false; }
+        //if (this.outputs[this.outputs.length - 1] !== 0) { this.running = false; }
     }
 
     op5(addresses) {
-        this.log(`If ${this.mem[addresses[1]]} is nonzero, jumping to ${this.mem[addresses[0]]}.`);
+        this.log(`If ${this.mem[addresses[0]]} is nonzero, jumping to ${this.mem[addresses[1]]}.`);
         this.pc = this.mem[addresses[0]] !== 0 ? this.mem[addresses[1]] : this.pc + 3;
     }
 
     op6(addresses) {
-        this.log(`If ${this.mem[addresses[1]]} is zero, jumping to ${this.mem[addresses[0]]}.`);
+        this.log(`If ${this.mem[addresses[0]]} is zero, jumping to ${this.mem[addresses[1]]}.`);
         this.pc = this.mem[addresses[0]] === 0 ? this.mem[addresses[1]] : this.pc + 3;
     }
 
@@ -107,9 +109,19 @@ exports.IntCodeMachine = class IntCodeMachine {
     input(num) { this.inputs.push(num); }
 
     run() {
-        while (this.running) {
+        this.waitingForIO = false;
+        while (this.running && !this.waitingForIO) {
             this.step();
         }
-        return this.outputs;
+        return this.outputs.splice(0);
+    }
+
+    reset() {
+        this.mem = this.program.slice(0); //clone so that we can reset
+        this.pc = 0;
+        this.inputs = [];
+        this.outputs = [];
+        this.running = true;
+        this.waitingForIO = false;
     }
 }
