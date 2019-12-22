@@ -2,6 +2,7 @@ exports.IntCodeMachine = class IntCodeMachine {
     constructor(program, debug = false, noun, verb) {
         this.program = program.slice(0);
         this.pc = 0;
+        this.rb = 0;
         this.inputs = [];
         this.outputs = [];
         this.debug = debug;
@@ -17,18 +18,22 @@ exports.IntCodeMachine = class IntCodeMachine {
             .padStart(5, '0')
             .split('')
             .map(char => parseInt(char));
-        if (this.debug) { console.log(`PC: ${this.pc}, Instruction: ${instruction.join('')}`); }
+        if (this.debug) { console.log(`-------\nPC: ${this.pc}, Instruction: ${instruction.join('')}`); }
         if (instruction.length > 5) {
             throw new Error(`Instruction (${instruction.join('')}) too long`);
         }
         //extract opcode
         const opcode = instruction[3] * 10 + instruction[4];
         //parse parameter mode
-        const paramAddresses = [1, 2, 3].map(offset =>
-            instruction[3 - offset]
-                ? this.pc + offset
-                : this.mem[this.pc + offset]
-        );
+        const paramAddresses = [1, 2, 3].map(offset => {          
+            const mode = instruction[3 - offset];
+            switch (mode) {
+                case 2: return this.rb + this.mem[this.pc + offset];
+                case 1: return this.pc + offset;
+                case 0: return this.mem[this.pc + offset];
+                default: throw new Error('Unknown parameter mode');
+            }
+        });
 
         if (this.debug) { console.log(`Opcode: ${opcode}, ParameterAddresses: ${paramAddresses}`); }
 
@@ -41,6 +46,7 @@ exports.IntCodeMachine = class IntCodeMachine {
             case 6: return this.op6(paramAddresses);
             case 7: return this.op7(paramAddresses);
             case 8: return this.op8(paramAddresses);
+            case 9: return this.op9(paramAddresses);
             case 99: return this.running = false;
             default:
                 throw new Error(`invalid opcode ${opcode}`);
@@ -100,6 +106,12 @@ exports.IntCodeMachine = class IntCodeMachine {
         this.pc += 4;
     }
 
+    op9(addresses) {
+        this.log(`relative base set to ${this.rb + this.mem[addresses[0]]}`);
+        this.rb += this.mem[addresses[0]];
+        this.pc += 2;
+    }
+
     log(string) {
         if (this.debug) {
             console.log(string);
@@ -117,8 +129,11 @@ exports.IntCodeMachine = class IntCodeMachine {
     }
 
     reset() {
-        this.mem = this.program.slice(0); //clone so that we can reset
+        this.mem = new Proxy(this.program.slice(0), { //clone so that we can reset
+            get: (obj, prop) => prop in obj ? obj[prop] : 0  //out-of-bounds accesses return 0
+        });
         this.pc = 0;
+        this.rb = 0;
         this.inputs = [];
         this.outputs = [];
         this.running = true;
