@@ -38,6 +38,14 @@ class Input {
                         .map(element => parseInt(element))
                 );
     }
+
+    linesAsStringCSVs() {
+        return this._linesAsStringCSVs ?
+            this._linesAsStringCSVs :
+            this._linesAsStringCSVs =
+            this.linesAsStrings()
+                .map(line => line.trim().split(','));
+    }
 }
 
 exports.InputFile = class InputFile extends Input {
@@ -66,7 +74,8 @@ exports.TestFile = class TestFile extends exports.InputFile {
     check(result, testNumber, integerResults = false) {
         const expected = integerResults ?
             parseInt(this.testData[testNumber].result) :
-            this.testData[testNumber].result;
+            this.testData[testNumber].result.trim();
+
         if (result === expected) {
             console.log(`Test ${testNumber} passed!`);
         } else {
