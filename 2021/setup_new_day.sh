@@ -10,4 +10,4 @@ cd $1
 cargo init --name solution$1
 touch problem_part_1.md
 touch problem_part_2.md
-wget -O input.txt https://adventofcode.com/2021/day/$1/input
+touch input.txt
