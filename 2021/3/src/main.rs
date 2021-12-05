@@ -23,40 +23,10 @@ fn main() {
     println!("{}",result);
 }
 
-enum Command {
-    Up(i64),
-    Down(i64),
-    Forward(i64),
-}
-
-impl Command {
-    fn new(string: &str) -> Command {
-        let strings: Vec<&str> = string.split(' ')
-            .collect();
-
-        match strings.as_slice() {
-            ["up", y] => Command::Up(y.parse().unwrap()),
-            ["down", y] => Command::Down(y.parse().unwrap()),
-            ["forward", x] => Command::Forward(x.parse().unwrap()),
-            z => {println!("{:?}",z); panic!()} 
-        }
-    }
-}
-
 struct Submarine {
-    depth: i64,
-    distance: i64,
-    aim: i64,
 }
 
 impl Submarine {
-    fn new() -> Submarine {
-        Submarine {
-            distance: 0,
-            depth: 0,
-            aim: 0,
-        }
-    }
 
     fn parse_diagnostics(lines: Lines, bit_width: usize) -> (u64,u64) {
         let lines2 = lines.clone();
@@ -103,7 +73,7 @@ impl Submarine {
         let mut i: u32 = bit_width.try_into().unwrap();
         while values2.len() > 1 {
             i -= 1;
-            let bit = most_common_bit(&values2, i, 1);
+            let bit = most_common_bit(&values2, i);
             println!("Bit {} most common: {:?}", i, bit);
             values2 = values2.into_iter()
                 .filter(|x| get_bit(*x,i) == match bit {
@@ -120,7 +90,7 @@ impl Submarine {
         let mut i: u32 = bit_width.try_into().unwrap();
         while values3.len() > 1 {
             i -= 1;
-            let bit = most_common_bit(&values3, i, 0);
+            let bit = most_common_bit(&values3, i);
             println!("Bit {} least common: {:?}", i, bit);
             values3 = values3.into_iter()
                 .filter(|x| get_bit(*x,i) == match bit {
@@ -136,28 +106,6 @@ impl Submarine {
         (gamma * epsilon, values2[0] * values3[0])
     }
 
-    fn naively_navigate(&mut self, command: Command) {
-        match command {
-            Command::Up(y) => self.depth -= y,
-            Command::Down(y) => self.depth += y,
-            Command::Forward(x) => self.distance += x,
-        }
-    }
-
-    fn properly_navigate(&mut self, command: Command) {
-        match command {
-            Command::Up(y) => self.aim -= y,
-            Command::Down(y) => self.aim += y,
-            Command::Forward(x) => {
-                self.distance += x;
-                self.depth += self.aim * x;
-            },
-        }
-    }
-
-    fn result(&self) -> i64 {
-        self.distance * self.depth
-    }
 }
 
 fn get_bit(num: u64, position: u32) -> u64 {
@@ -171,7 +119,7 @@ enum Bit {
     Different(u64),
 }
 
-fn most_common_bit(nums: &[u64], bit_position: u32, bias: u64) -> Bit {
+fn most_common_bit(nums: &[u64], bit_position: u32) -> Bit {
     let two: u64 = 2;
     let len: u64 = nums.len().try_into().unwrap();
     let count: u64 = nums.iter()
