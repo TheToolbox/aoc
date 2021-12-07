@@ -1,5 +1,4 @@
 use core::panic;
-use std::fmt;
 use std::fs;
 use std::env;
 
@@ -39,7 +38,8 @@ impl LanternFish {
         LanternFish(age)
     }
 
-    fn step(&mut self) -> Option<LanternFish> {
+    //naive first attempt. works for part 1, but is way too slow for part 2 (hence the 'School' approach)
+    fn _step(&mut self) -> Option<LanternFish> {
         if self.0 < 1 {
             self.0 = 6;
             Some(LanternFish::new(8))
