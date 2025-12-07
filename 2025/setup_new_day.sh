@@ -1,0 +1,53 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "please pass day number"
+    exit 1
+fi
+
+mkdir $1
+cd $1
+cargo init --name solution$1
+
+# Add aocutils dependency
+echo 'aocutils = { path = "../aocutils" }' >> Cargo.toml
+
+# Create main.rs with template
+cat > src/main.rs << 'EOF'
+// Common aocutils imports:
+// use aocutils::parsing::*;        // parse_csv, parse_space_separated, parse_digit_grid, etc.
+// use aocutils::grid::Grid2D;      // Grid with neighbors_4/8, iter_cells, etc.
+// use aocutils::point::Point;      // Point with manhattan_distance, neighbors, etc.
+// use aocutils::bits::*;           // get_bit, set_bit, count_ones, etc.
+
+use aocutils::{get_input, Part};
+
+fn main() {
+    let input = get_input();
+
+    let result = match input.part {
+        Part::One => solve_part_one(&input.lines),
+        Part::Two => solve_part_two(&input.lines),
+    };
+
+    println!("{}", result);
+}
+
+fn solve_part_one(lines: &[String]) -> usize {
+    println!("Solving part 1...");
+
+    // TODO: Implement part 1
+    0
+}
+
+fn solve_part_two(lines: &[String]) -> usize {
+    println!("Solving part 2...");
+
+    // TODO: Implement part 2
+    0
+}
+EOF
+
+touch problem_part_1.md
+touch problem_part_2.md
+touch input.txt
