@@ -4,7 +4,9 @@
 // use aocutils::point::Point;      // Point with manhattan_distance, neighbors, etc.
 // use aocutils::bits::*;           // get_bit, set_bit, count_ones, etc.
 
-use aocutils::{Part, get_input, point::Point};
+use core::panic;
+
+use aocutils::{AocInput, Part, get_input, grid::Grid2D, point::Point};
 
 fn main() {
     let input = get_input();
@@ -29,22 +31,86 @@ fn main() {
 
     let result = match input.part {
         Part::One => solve_part_one(manifold),
-        Part::Two => solve_part_two(manifold),
+        Part::Two => solve_part_two(input),
     };
 
     println!("{}", result);
 }
 
-fn solve_part_one(mut manifold: Manifold) -> u64 {
+fn solve_part_one(mut manifold: Manifold) -> u128 {
     println!("Solving part 1...");
-    manifold.count_splits()
+    manifold.count_splits().into()
 }
 
-fn solve_part_two(mut _manifold: Manifold) -> u64 {
+fn solve_part_two(mut input: AocInput) -> u128 {
     println!("Solving part 2...");
 
-    // TODO: Implement part 2
-    0
+    //start at the bottom
+    input.lines.reverse();
+
+    let mut grid: Grid2D<Element> = Grid2D::new(vec![]);
+
+    //load the manifold into a grid (instead of the fun manifold type I made for part one thinking it would be smart...)
+
+    input.lines.iter().for_each(|line| {
+        grid.data.push(line.chars().map(|c| 
+            {
+                match c {
+                    '.' => Element::Blank(0),
+                    '^' => Element::Splitter(0),
+                    'S' => Element::Start,
+                    x => panic!("invalid Manifold, found: {}", x),
+                }
+            }
+        )
+        .collect())
+    });
+
+    //first row is 1s
+    for col in 0..grid.data[0].len() {
+        grid.data[0][col] = Element::Blank(1);
+    }
+
+    for row in 1..grid.data.len() {
+        
+        for col in 0..grid.data[row].len() {
+            let below = grid.data[row-1][col].get_value();
+
+            let below_left = grid.data[row-1][col.saturating_sub(1)].get_value(); 
+
+            let below_right = grid.data[row-1][(1+col).min(grid.data[row].len() - 1)].get_value();
+            
+            grid.data[row][col] = match grid.data[row][col] {
+                Element::Blank(_) => Element::Blank(*below),
+                Element::Splitter(_) => Element::Splitter(*below_left + *below_right),
+                Element::Start => {
+                    return *below_left + *below_right;
+                }
+            };
+        }
+
+        //println!("{:?}",grid.data[row]);
+
+    }
+   
+    panic!("Reached the end of input without hitting the Start");
+}
+
+#[derive(Clone,Debug)]
+enum Element {
+    Blank(u128),
+    Splitter(u128),
+    Start,
+}
+
+impl Element {
+    fn get_value(&self) -> &u128 {
+        match self {
+                Element::Blank(x) => x,
+                Element::Splitter(x) => x,
+                Element::Start => &0,
+        }
+    }
 }
 
 struct Splitter {
@@ -100,7 +166,7 @@ impl Manifold {
                 if splitter.used { 
                     0
                 } else {
-                    splitter.used = false;
+                    splitter.used = true;
                     1 + 
                     self.count_from(Point { x: point.x - 1, y: point.y}) + 
                     self.count_from(Point { x: point.x + 1, y: point.y})

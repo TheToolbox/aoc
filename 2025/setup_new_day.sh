@@ -5,6 +5,12 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
+# Check if directory already exists
+if [ -d "$1" ]; then
+    echo "Error: Directory '$1' already exists. Aborting to prevent overwriting."
+    exit 1
+fi
+
 mkdir $1
 cd $1
 cargo init --name solution$1

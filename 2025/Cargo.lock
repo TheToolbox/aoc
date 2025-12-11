@@ -44,3 +44,17 @@ version = "0.1.0"
 dependencies = [
  "aocutils",
 ]
+
+[[package]]
+name = "solution8"
+version = "0.1.0"
+dependencies = [
+ "aocutils",
+]
+
+[[package]]
+name = "solution9"
+version = "0.1.0"
+dependencies = [
+ "aocutils",
+]
