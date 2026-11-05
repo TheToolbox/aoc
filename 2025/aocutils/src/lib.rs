@@ -6,6 +6,7 @@ pub mod parsing;
 pub mod grid;
 pub mod point;
 pub mod bits;
+pub mod fetch;
 
 /// Represents which part of the Advent of Code problem to solve
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -54,6 +54,10 @@ fn solve_part_two(lines: &[String]) -> usize {
 }
 EOF
 
-touch problem_part_1.md
-touch problem_part_2.md
-touch input.txt
+# Download the input and examples (needs your session cookie; see aocutils/README.md).
+# These files are git-ignored. If the fetch fails, paste the input into input.txt yourself.
+cd ..
+if ! cargo aoc fetch "$1"; then
+    touch "$1/input.txt"
+    echo "Couldn't fetch day $1. Add the input to $1/input.txt yourself."
+fi

@@ -49,6 +49,26 @@ cargo run 1 input.txt  # Solve part 1
 cargo run 2 input.txt  # Solve part 2
 ```
 
+## Fetching inputs and examples
+
+`cargo aoc fetch <day>`, run from the year's folder (`2025/`), downloads:
+
+- `<day>/input.txt`: your puzzle input. It's only downloaded once; add `--force` to download it again.
+- `<day>/example_1.txt`: the example from part 1's text (the code block after "For example").
+- `<day>/example_2.txt`: part 2's example, once part 1 is solved and only if it differs from part 1's. Run the command again after solving part 1 to get it.
+
+It needs your adventofcode.com `session` cookie (from your browser's dev tools, under Cookies), in one of:
+
+- the `AOC_SESSION` environment variable
+- `~/.config/aoc/session`
+- `.aoc-session` in the year's folder (git-ignored)
+
+The year comes from the folder name; pass `--year YYYY` to override it. `setup_new_day.sh` runs the fetch for you.
+
+Run a solution on an example by passing that file instead of the input, for example `cargo run -p solution5 -- 1 5/example_1.txt`.
+
+All of these files are git-ignored, because the Advent of Code creator asks people not to publish inputs or puzzle text.
+
 ## Modules
 
 ### Input Handling

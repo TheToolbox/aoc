@@ -1,0 +1,9 @@
+# Puzzle inputs and puzzle text stay local: the Advent of Code creator asks
+# people not to publish them. `cargo aoc fetch <day>` (in 2025/) re-downloads them.
+input.txt
+testinput.txt
+example*.txt
+problem_part_*.md
+
+# adventofcode.com session cookie
+.aoc-session

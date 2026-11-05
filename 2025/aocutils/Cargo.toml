@@ -3,4 +3,13 @@ name = "aocutils"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+# Only the `aoc` command-line tool needs HTTP, so solutions don't compile it.
+fetch = ["dep:ureq"]
+
 [dependencies]
+ureq = { version = "2", optional = true }
+
+[[bin]]
+name = "aoc"
+required-features = ["fetch"]

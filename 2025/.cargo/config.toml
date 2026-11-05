@@ -1,0 +1,3 @@
+[alias]
+# `cargo aoc fetch <day>` downloads that day's input and examples.
+aoc = "run -q -p aocutils --features fetch --bin aoc --"
